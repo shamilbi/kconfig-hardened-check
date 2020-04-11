@@ -6,18 +6,12 @@ from .check import OptCheck, VerCheck, OR, AND, PresenceCheck
 
 
 class Reason:
-    '''
-    r = Reason(checklist, 'defconfig', 'self_protection')
-    r.add('BUG', 'y')
-    r.add_or(('STRICT_KERNEL_RWX', 'y'),
-             ('DEBUG_RODATA', 'y'))     # before v4.11
-    '''
     def __init__(self, checklist, decision, reason):
         self.checklist = checklist
         self.decision = decision
         self.reason = reason
 
-    def create(self, name, expected):
+    def create_check(self, name, expected):
         return OptCheck(name, expected, self.decision, self.reason)
 
     def _scan_checks(self, *checks):
@@ -27,7 +21,7 @@ class Reason:
                 yield c
             else:
                 name, expected = c
-                yield self.create(name, expected)
+                yield self.create_check(name, expected)
 
     def create_or(self, *checks):
         'checks = (name, expected), OptCheck(), ...'
@@ -40,11 +34,6 @@ class Reason:
         l = list(self._scan_checks(*checks))
         check = AND(*l)
         return check
-
-    def add(self, name, expected):
-        c = self.create(name, expected)
-        self.checklist.append(c)
-        return c
 
     def add_or(self, *checks):
         'checks = (name, expected), OptCheck(), ...'
@@ -112,10 +101,14 @@ class Parser:
                 m = self.LEVEL_RE.match(self.line)
                 self.level = len(m.group(1))
                 self.line = self.line[self.level:]
+                # '  xxx' --> 'xxx'
                 if self.line.startswith('#'):
                     # comment
                     continue
                 if self.skip_level and self.level > self.skip_level:
+                    # arch: ...
+                    #   ...
+                    #   ...
                     continue
                 self.skip_level = 0
                 self.parse2()
@@ -185,39 +178,35 @@ class Parser:
         m = self.CHECK_RE_2.match(line)
         if m:
             val = m.group(1)
+            # INTEGRITY=y
+            # ARCH_MMAP_RND_BITS=32
             if left == 'version':
-                val_list = val.split('.')
-                if not all(i.isdigit() for i in val_list):
-                    self.error('bad version')
-                check = VerCheck(tuple(int(i) for i in val_list))
+                # version=5.5
+                check = self.parse_version(val)
             elif left == 'presence':
+                # presence=LDISC_AUTOLOAD
                 check = PresenceCheck(val)
             else:
                 if not val:
+                    # LIVEPATCH=
                     val = 'is not set'
-                check = self.reason.create(left, val)
+                check = self.reason.create_check(left, val)
         else:
+            # modules_not_set
             if left not in self.var_d:
                 self.error(f'var not found: {left}')
             check = self.var_d[left]
         if var:
+            if var in self.var_d:
+                self.error(f'var defined twice: {var}')
             self.var_d[var] = check
         elif self.cond:
             self.cond_checks.append(check)
         else:
             self.checklist.append(check)
 
-    #def parse_version(self, rest):
-    #    if not self.cond:
-    #        self.error('check version without condition (or, and)')
-    #    v = split_by_comma(rest)[0]
-    #    # 5.5, comment
-    #    vl = v.split('.')
-    #    if not all(i.isdigit() for i in vl):
-    #        self.error(f'bad version: {v}')
-    #    self.cond_checks.append(VerCheck(tuple(int(i) for i in vl)))
-
-
-def construct_checklist(checklist, arch):
-    parser = Parser(arch, checklist, 'rules.txt')
-    parser.parse()
+    def parse_version(self, s):
+        digits = s.split('.')
+        if not all(i.isdigit() for i in digits):
+            self.error('bad version')
+        return VerCheck(tuple(int(i) for i in digits))

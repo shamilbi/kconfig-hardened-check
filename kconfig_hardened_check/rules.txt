@@ -1,4 +1,5 @@
 # vim: tabstop=4, expandtab, shiftwidth=4
+# special words: reason, arch, or, add, version, presence
 
 reason: kspp, cut_attack_surface
     modules_not_set: MODULES=
