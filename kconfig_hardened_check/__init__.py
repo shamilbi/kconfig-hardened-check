@@ -64,17 +64,18 @@ from .__about__ import __version__
 # pylint: disable=line-too-long,bad-whitespace,too-many-branches
 # pylint: disable=too-many-statements,global-statement
 
-# debug_mode enables:
-#    - reporting about unknown kernel options in the config,
-#    - verbose printing of ComplexOptChecks (OR, AND).
-debug_mode = False
-
-# json_mode is for printing results in JSON format
-json_mode = False
-
 supported_archs = ['X86_64', 'X86_32', 'ARM64', 'ARM']
 
-kernel_version = None
+
+class Env:
+    # debug_mode enables:
+    #    - reporting about unknown kernel options in the config,
+    #    - verbose printing of ComplexOptChecks (OR, AND).
+    debug_mode = False
+
+    # json_mode is for printing results in JSON format
+    json_mode = False
+    kernel_version = None
 
 
 class OptCheck:
@@ -114,7 +115,7 @@ class VerCheck:
         self.exp_str = '.'.join(str(i) for i in self.ver_expected)
 
     def check(self):
-        if kernel_version >= self.ver_expected:
+        if Env.kernel_version >= self.ver_expected:
             self.result = f'OK: version >= {self.exp_str}'
             return True, self.result
         self.result = f'FAIL: version < {self.exp_str}'
@@ -172,7 +173,7 @@ class ComplexOptCheck:
         return self.opts[0].reason
 
     def table_print(self, with_results):
-        if debug_mode:
+        if Env.debug_mode:
             print('    {:87}'.format('<<< ' + self.__class__.__name__ + ' >>>'), end='')
             if with_results:
                 print('|   {}'.format(self.result), end='')
@@ -233,7 +234,7 @@ def detect_arch(fname):
     with open(fname, 'r') as f:
         arch_pattern = re.compile("CONFIG_[a-zA-Z0-9_]*=y")
         arch = None
-        if not json_mode:
+        if not Env.json_mode:
             print('[+] Trying to detect architecture in "{}"...'.format(fname))
         for line in f.readlines():
             if arch_pattern.match(line):
@@ -251,12 +252,12 @@ def detect_arch(fname):
 def detect_version(fname):
     with open(fname, 'r') as f:
         ver_pattern = re.compile("# Linux/.* Kernel Configuration")
-        if not json_mode:
+        if not Env.json_mode:
             print('[+] Trying to detect kernel version in "{}"...'.format(fname))
         for line in f:
             if ver_pattern.match(line):
                 line = line.strip()
-                if not json_mode:
+                if not Env.json_mode:
                     print('[+] Found version line: "{}"'.format(line))
                 parts = line.split()
                 ver_str = parts[2]
@@ -505,7 +506,7 @@ def construct_checklist(checklist, arch):
 
 
 def print_checklist(checklist, with_results):
-    if json_mode:
+    if Env.json_mode:
         opts = []
         for o in checklist:
             opt = ['CONFIG_'+o.name, o.expected, o.decision, o.reason]
@@ -530,7 +531,7 @@ def print_checklist(checklist, with_results):
     for opt in checklist:
         opt.table_print(with_results)
         print()
-        if debug_mode:
+        if Env.debug_mode:
             print('-' * sep_line_len)
     print()
 
@@ -556,7 +557,7 @@ def check_config_file(checklist, fname, arch):
         opt_is_on = re.compile("CONFIG_[a-zA-Z0-9_]*=[a-zA-Z0-9_\"]*")
         opt_is_off = re.compile("# CONFIG_[a-zA-Z0-9_]* is not set")
 
-        if not json_mode:
+        if not Env.json_mode:
             print('[+] Checking "{}" against {} hardening preferences...'.format(fname, arch))
         for line in f.readlines():
             line = line.strip()
@@ -578,7 +579,7 @@ def check_config_file(checklist, fname, arch):
 
         perform_checks(checklist, parsed_options)
 
-        if debug_mode:
+        if Env.debug_mode:
             known_options = []
             for opt in checklist:
                 if hasattr(opt, 'opts'):
@@ -594,10 +595,6 @@ def check_config_file(checklist, fname, arch):
         print_checklist(checklist, True)
 
 def main():
-    global debug_mode
-    global json_mode
-    global kernel_version
-
     config_checklist = []
 
     parser = ArgumentParser(prog='kconfig-hardened-check',
@@ -614,10 +611,12 @@ def main():
     args = parser.parse_args()
 
     if args.debug:
-        debug_mode = True
+        Env.debug_mode = True
         print('[!] WARNING: debug mode is enabled')
     if args.json:
-        json_mode = True
+        Env.json_mode = True
+    debug_mode = Env.debug_mode
+    json_mode = Env.json_mode
     if debug_mode and json_mode:
         sys.exit('[!] ERROR: options --debug and --json cannot be used simultaneously')
 
@@ -629,6 +628,7 @@ def main():
             print('[+] Detected architecture: {}'.format(arch))
 
         kernel_version, msg = detect_version(args.config)
+        Env.kernel_version = kernel_version
         if not kernel_version:
             sys.exit('[!] ERROR: {}'.format(msg))
         elif not json_mode:
