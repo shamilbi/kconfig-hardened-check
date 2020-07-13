@@ -1,4 +1,4 @@
-# vim: tabstop=4, expandtab, shiftwidth=4
+# vim: tabstop=4 expandtab shiftwidth=4
 # special words: reason, arch, or, add, version, presence
 
 reason: kspp, cut_attack_surface
@@ -7,15 +7,15 @@ reason: kspp, cut_attack_surface
 
 reason: defconfig, self_protection
     BUG=y
-    or: STRICT_KERNEL_RWX=y
-        DEBUG_RODATA=y, before v4.11
+    SLUB_DEBUG=y
+    GCC_PLUGINS=y
     or: STACKPROTECTOR_STRONG=y
         CC_STACKPROTECTOR_STRONG=y
-    SLUB_DEBUG=y
+    or: STRICT_KERNEL_RWX=y
+        DEBUG_RODATA=y, before v4.11
     or: STRICT_MODULE_RWX=y
         DEBUG_SET_MODULE_RONX=y
         modules_not_set, DEBUG_SET_MODULE_RONX was before v4.11
-    GCC_PLUGINS=y
     or: REFCOUNT_FULL=y
         version=5.5, REFCOUNT_FULL is enabled by default since v5.5
     iommu_support_is_set: IOMMU_SUPPORT=y, is needed for mitigating DMA attacks
@@ -24,9 +24,9 @@ reason: defconfig, self_protection
         MICROCODE=y, is needed for mitigating CPU bugs
         RETPOLINE=y
         X86_SMAP=y
+        SYN_COOKIES=y, another reason?
         or: X86_UMIP=y
             X86_INTEL_UMIP=y
-        SYN_COOKIES=y, another reason?
     arch: X86_64
         PAGE_TABLE_ISOLATION=y
         RANDOMIZE_MEMORY=y
@@ -35,9 +35,11 @@ reason: defconfig, self_protection
         and: AMD_IOMMU=y
              iommu_support_is_set
     arch: ARM64
+        ARM64_PAN=y
         UNMAP_KERNEL_AT_EL0=y
         HARDEN_EL2_VECTORS=y
         RODATA_FULL_DEFAULT_ENABLED=y
+        ARM64_PTR_AUTH=y
     arch: X86_64, ARM64
         VMAP_STACK=y
     arch: X86_64, ARM64, X86_32
@@ -57,13 +59,14 @@ reason: kspp, self_protection
     SLAB_FREELIST_RANDOM=y
     SHUFFLE_PAGE_ALLOCATOR=y
     FORTIFY_SOURCE=y
-    randstruct_is_set: GCC_PLUGIN_RANDSTRUCT=y
-    randstruct_is_set
-    GCC_PLUGIN_LATENT_ENTROPY=y
     DEBUG_LIST=y
     DEBUG_SG=y
     DEBUG_CREDENTIALS=y
     DEBUG_NOTIFIERS=y
+    INIT_ON_ALLOC_DEFAULT_ON=y
+    GCC_PLUGIN_LATENT_ENTROPY=y
+    randstruct_is_set: GCC_PLUGIN_RANDSTRUCT=y
+    randstruct_is_set
     hardened_usercopy_is_set: HARDENED_USERCOPY=y
     hardened_usercopy_is_set
     and: HARDENED_USERCOPY_FALLBACK=
@@ -78,19 +81,11 @@ reason: kspp, self_protection
         modules_not_set, refers to LOCKDOWN
     or: INIT_STACK_ALL=y
         GCC_PLUGIN_STRUCTLEAK_BYREF_ALL=y
-    INIT_ON_ALLOC_DEFAULT_ON=y
     or: INIT_ON_FREE_DEFAULT_ON=y
         PAGE_POISONING=y, before v5.3
     arch: X86_64, ARM64, X86_32
         stackleak_is_set: GCC_PLUGIN_STACKLEAK=y
         stackleak_is_set
-
-reason: clipos, self_protection
-    arch: X86_64, ARM64, X86_32
-        and: STACKLEAK_METRICS=
-             stackleak_is_set
-        and: STACKLEAK_RUNTIME_DISABLE=
-             stackleak_is_set
 
 reason: kspp, self_protection
     arch: X86_64, X86_32
@@ -110,10 +105,15 @@ reason: clipos, self_protection
     DEBUG_VIRTUAL=y
     STATIC_USERMODEHELPER=y, needs userspace support (systemd)
     SLAB_MERGE_DEFAULT=, slab_nomerge
-    and: GCC_PLUGIN_RANDSTRUCT_PERFORMANCE=
-         randstruct_is_set
     RANDOM_TRUST_BOOTLOADER=
     RANDOM_TRUST_CPU=
+    and: GCC_PLUGIN_RANDSTRUCT_PERFORMANCE=
+         randstruct_is_set
+    arch: X86_64, ARM64, X86_32
+        and: STACKLEAK_METRICS=
+             stackleak_is_set
+        and: STACKLEAK_RUNTIME_DISABLE=
+             stackleak_is_set
     arch: X86_64, X86_32
         and: INTEL_IOMMU_SVM=y
              iommu_support_is_set
@@ -150,11 +150,11 @@ reason: clipos, security_policy
     LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY=y
 
 reason: my, security_policy
+    SECURITY_SAFESETID=y
     loadpin_is_set: SECURITY_LOADPIN=y, needs userspace support
     loadpin_is_set
     and: SECURITY_LOADPIN_ENFORCE=y
          loadpin_is_set
-    SECURITY_SAFESETID=y
 
 reason: defconfig, cut_attack_surface
     SECCOMP=y
@@ -163,17 +163,8 @@ reason: defconfig, cut_attack_surface
         or: STRICT_DEVMEM=y
             devmem_not_set, refers to LOCKDOWN
 
-    modules_not_set
-    devmem_not_set
 
 reason: kspp, cut_attack_surface
-    or: IO_STRICT_DEVMEM=y
-        devmem_not_set, refers to LOCKDOWN
-    arch: ARM
-        or: STRICT_DEVMEM=y
-            devmem_not_set, refers to LOCKDOWN
-    arch: X86_64
-        LEGACY_VSYSCALL_NONE=y, vsyscall=none
     ACPI_CUSTOM_METHOD=, refers to LOCKDOWN
     COMPAT_BRK=
     DEVKMEM=, refers to LOCKDOWN
@@ -188,6 +179,15 @@ reason: kspp, cut_attack_surface
     X86_X32=
     MODIFY_LDT_SYSCALL=
     OABI_COMPAT=
+    modules_not_set
+    devmem_not_set
+    or: IO_STRICT_DEVMEM=y
+        devmem_not_set, refers to LOCKDOWN
+    arch: ARM
+        or: STRICT_DEVMEM=y
+            devmem_not_set, refers to LOCKDOWN
+    arch: X86_64
+        LEGACY_VSYSCALL_NONE=y, vsyscall=none
 
 reason: grsecurity, cut_attack_surface
     X86_PTDUMP=
@@ -222,8 +222,6 @@ reason: lockdown, cut_attack_surface
     MMIOTRACE_TEST=, refers to LOCKDOWN
 
 reason: clipos, cut_attack_surface
-    arch: X86_64, X86_32
-        X86_INTEL_TSX_MODE_OFF=y, tsx=off
     STAGING=
     KSM=, to prevent FLUSH+RELOAD attack
     KALLSYMS=
@@ -235,6 +233,8 @@ reason: clipos, cut_attack_surface
     X86_CPUID=
     and: LDISC_AUTOLOAD=
          presence=LDISC_AUTOLOAD
+    arch: X86_64, X86_32
+        X86_INTEL_TSX_MODE_OFF=y, tsx=off
 
 reason: grapheneos, cut_attack_surface
     AIO=
@@ -251,8 +251,6 @@ reason: my, cut_attack_surface
 
 reason: defconfig, userspace_hardening
     INTEGRITY=y
-    arch: ARM64
-        ARM64_PTR_AUTH=y
     arch: ARM, X86_32
         VMSPLIT_3G=y
 

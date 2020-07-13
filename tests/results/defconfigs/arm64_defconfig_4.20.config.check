@@ -8,16 +8,18 @@
                  option name                 | desired val | decision |       reason       |   check result
 =========================================================================================================================
 CONFIG_BUG                                   |      y      |defconfig |  self_protection   |   OK
-CONFIG_STRICT_KERNEL_RWX                     |      y      |defconfig |  self_protection   |   OK
-CONFIG_STACKPROTECTOR_STRONG                 |      y      |defconfig |  self_protection   |   OK
 CONFIG_SLUB_DEBUG                            |      y      |defconfig |  self_protection   |   OK
-CONFIG_STRICT_MODULE_RWX                     |      y      |defconfig |  self_protection   |   OK
 CONFIG_GCC_PLUGINS                           |      y      |defconfig |  self_protection   |   FAIL: "is not set"
+CONFIG_STACKPROTECTOR_STRONG                 |      y      |defconfig |  self_protection   |   OK
+CONFIG_STRICT_KERNEL_RWX                     |      y      |defconfig |  self_protection   |   OK
+CONFIG_STRICT_MODULE_RWX                     |      y      |defconfig |  self_protection   |   OK
 CONFIG_REFCOUNT_FULL                         |      y      |defconfig |  self_protection   |   OK
 CONFIG_IOMMU_SUPPORT                         |      y      |defconfig |  self_protection   |   OK
+CONFIG_ARM64_PAN                             |      y      |defconfig |  self_protection   |   OK
 CONFIG_UNMAP_KERNEL_AT_EL0                   |      y      |defconfig |  self_protection   |   OK
 CONFIG_HARDEN_EL2_VECTORS                    |      y      |defconfig |  self_protection   |   OK
 CONFIG_RODATA_FULL_DEFAULT_ENABLED           |      y      |defconfig |  self_protection   |   FAIL: not found
+CONFIG_ARM64_PTR_AUTH                        |      y      |defconfig |  self_protection   |   FAIL: not found
 CONFIG_VMAP_STACK                            |      y      |defconfig |  self_protection   |   OK
 CONFIG_RANDOMIZE_BASE                        |      y      |defconfig |  self_protection   |   FAIL: "is not set"
 CONFIG_THREAD_INFO_IN_TASK                   |      y      |defconfig |  self_protection   |   OK
@@ -29,12 +31,13 @@ CONFIG_SLAB_FREELIST_HARDENED                |      y      |   kspp   |  self_pr
 CONFIG_SLAB_FREELIST_RANDOM                  |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_SHUFFLE_PAGE_ALLOCATOR                |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_FORTIFY_SOURCE                        |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
-CONFIG_GCC_PLUGIN_RANDSTRUCT                 |      y      |   kspp   |  self_protection   |   FAIL: not found
-CONFIG_GCC_PLUGIN_LATENT_ENTROPY             |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_DEBUG_LIST                            |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_DEBUG_SG                              |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_DEBUG_CREDENTIALS                     |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_DEBUG_NOTIFIERS                       |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
+CONFIG_INIT_ON_ALLOC_DEFAULT_ON              |      y      |   kspp   |  self_protection   |   FAIL: not found
+CONFIG_GCC_PLUGIN_LATENT_ENTROPY             |      y      |   kspp   |  self_protection   |   FAIL: not found
+CONFIG_GCC_PLUGIN_RANDSTRUCT                 |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_HARDENED_USERCOPY                     |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_HARDENED_USERCOPY_FALLBACK            | is not set  |   kspp   |  self_protection   |   FAIL: CONFIG_HARDENED_USERCOPY is needed
 CONFIG_MODULE_SIG                            |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
@@ -42,11 +45,8 @@ CONFIG_MODULE_SIG_ALL                        |      y      |   kspp   |  self_pr
 CONFIG_MODULE_SIG_SHA512                     |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_MODULE_SIG_FORCE                      |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_INIT_STACK_ALL                        |      y      |   kspp   |  self_protection   |   FAIL: not found
-CONFIG_INIT_ON_ALLOC_DEFAULT_ON              |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_INIT_ON_FREE_DEFAULT_ON               |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_GCC_PLUGIN_STACKLEAK                  |      y      |   kspp   |  self_protection   |   FAIL: not found
-CONFIG_STACKLEAK_METRICS                     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK is needed
-CONFIG_STACKLEAK_RUNTIME_DISABLE             | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK is needed
 CONFIG_ARM64_SW_TTBR0_PAN                    |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_SYN_COOKIES                           |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_DEFAULT_MMAP_MIN_ADDR                 |    32768    |   kspp   |  self_protection   |   FAIL: "4096"
@@ -54,9 +54,11 @@ CONFIG_SECURITY_DMESG_RESTRICT               |      y      |  clipos  |  self_pr
 CONFIG_DEBUG_VIRTUAL                         |      y      |  clipos  |  self_protection   |   FAIL: "is not set"
 CONFIG_STATIC_USERMODEHELPER                 |      y      |  clipos  |  self_protection   |   FAIL: "is not set"
 CONFIG_SLAB_MERGE_DEFAULT                    | is not set  |  clipos  |  self_protection   |   FAIL: "y"
-CONFIG_GCC_PLUGIN_RANDSTRUCT_PERFORMANCE     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_RANDSTRUCT is needed
 CONFIG_RANDOM_TRUST_BOOTLOADER               | is not set  |  clipos  |  self_protection   |   OK: not found
 CONFIG_RANDOM_TRUST_CPU                      | is not set  |  clipos  |  self_protection   |   OK: not found
+CONFIG_GCC_PLUGIN_RANDSTRUCT_PERFORMANCE     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_RANDSTRUCT is needed
+CONFIG_STACKLEAK_METRICS                     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK is needed
+CONFIG_STACKLEAK_RUNTIME_DISABLE             | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK is needed
 CONFIG_SLUB_DEBUG_ON                         |      y      |    my    |  self_protection   |   FAIL: "is not set"
 CONFIG_RESET_ATTACK_MITIGATION               |      y      |    my    |  self_protection   |   FAIL: "is not set"
 CONFIG_SECURITY                              |      y      |defconfig |  security_policy   |   OK
@@ -65,15 +67,12 @@ CONFIG_SECURITY_WRITABLE_HOOKS               | is not set  |    my    |  securit
 CONFIG_SECURITY_LOCKDOWN_LSM                 |      y      |  clipos  |  security_policy   |   FAIL: not found
 CONFIG_SECURITY_LOCKDOWN_LSM_EARLY           |      y      |  clipos  |  security_policy   |   FAIL: not found
 CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY|      y      |  clipos  |  security_policy   |   FAIL: not found
+CONFIG_SECURITY_SAFESETID                    |      y      |    my    |  security_policy   |   FAIL: not found
 CONFIG_SECURITY_LOADPIN                      |      y      |    my    |  security_policy   |   FAIL: "is not set"
 CONFIG_SECURITY_LOADPIN_ENFORCE              |      y      |    my    |  security_policy   |   FAIL: CONFIG_SECURITY_LOADPIN is needed
-CONFIG_SECURITY_SAFESETID                    |      y      |    my    |  security_policy   |   FAIL: not found
 CONFIG_SECCOMP                               |      y      |defconfig | cut_attack_surface |   OK
 CONFIG_SECCOMP_FILTER                        |      y      |defconfig | cut_attack_surface |   OK
 CONFIG_STRICT_DEVMEM                         |      y      |defconfig | cut_attack_surface |   OK
-CONFIG_MODULES                               | is not set  |   kspp   | cut_attack_surface |   FAIL: "y"
-CONFIG_DEVMEM                                | is not set  |   kspp   | cut_attack_surface |   FAIL: "y"
-CONFIG_IO_STRICT_DEVMEM                      |      y      |   kspp   | cut_attack_surface |   FAIL: "is not set"
 CONFIG_ACPI_CUSTOM_METHOD                    | is not set  |   kspp   | cut_attack_surface |   OK
 CONFIG_COMPAT_BRK                            | is not set  |   kspp   | cut_attack_surface |   OK
 CONFIG_DEVKMEM                               | is not set  |   kspp   | cut_attack_surface |   OK: not found
@@ -88,6 +87,9 @@ CONFIG_IA32_EMULATION                        | is not set  |   kspp   | cut_atta
 CONFIG_X86_X32                               | is not set  |   kspp   | cut_attack_surface |   OK: not found
 CONFIG_MODIFY_LDT_SYSCALL                    | is not set  |   kspp   | cut_attack_surface |   OK: not found
 CONFIG_OABI_COMPAT                           | is not set  |   kspp   | cut_attack_surface |   OK: not found
+CONFIG_MODULES                               | is not set  |   kspp   | cut_attack_surface |   FAIL: "y"
+CONFIG_DEVMEM                                | is not set  |   kspp   | cut_attack_surface |   FAIL: "y"
+CONFIG_IO_STRICT_DEVMEM                      |      y      |   kspp   | cut_attack_surface |   FAIL: "is not set"
 CONFIG_X86_PTDUMP                            | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_ZSMALLOC_STAT                         | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_PAGE_OWNER                            | is not set  |grsecurity| cut_attack_surface |   OK
@@ -134,7 +136,6 @@ CONFIG_BPF_JIT                               | is not set  |    my    | cut_atta
 CONFIG_VIDEO_VIVID                           | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_INPUT_EVBUG                           | is not set  |    my    | cut_attack_surface |   OK
 CONFIG_INTEGRITY                             |      y      |defconfig |userspace_hardening |   OK
-CONFIG_ARM64_PTR_AUTH                        |      y      |defconfig |userspace_hardening |   FAIL: not found
 CONFIG_ARCH_MMAP_RND_BITS                    |     32      |  clipos  |userspace_hardening |   FAIL: "18"
 
-[+] config check is finished: 'OK' - 61 / 'FAIL' - 68
+[+] config check is finished: 'OK' - 62 / 'FAIL' - 68
