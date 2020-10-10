@@ -150,7 +150,7 @@ class AND(ComplexOptCheck):
                 return ret, self.result
             if not ret:
                 if hasattr(opt, 'expected'):
-                    self.result = 'FAIL: CONFIG_{} is needed'.format(opt.name)
+                    self.result = f'FAIL: CONFIG_{opt.name} not "{opt.expected}"'
                 else:
                     self.result = opt.result
                 return False, self.result

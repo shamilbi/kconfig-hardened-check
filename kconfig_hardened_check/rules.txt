@@ -104,6 +104,7 @@ reason: clipos, self_protection
     SECURITY_DMESG_RESTRICT=y
     DEBUG_VIRTUAL=y
     STATIC_USERMODEHELPER=y, needs userspace support (systemd)
+    EFI_DISABLE_PCI_DMA=y
     SLAB_MERGE_DEFAULT=, slab_nomerge
     RANDOM_TRUST_BOOTLOADER=
     RANDOM_TRUST_CPU=
@@ -190,7 +191,6 @@ reason: kspp, cut_attack_surface
         LEGACY_VSYSCALL_NONE=y, vsyscall=none
 
 reason: grsecurity, cut_attack_surface
-    X86_PTDUMP=
     ZSMALLOC_STAT=
     PAGE_OWNER=
     DEBUG_KMEMLEAK=
@@ -208,18 +208,15 @@ reason: grsecurity, cut_attack_surface
     DEVPORT=, refers to LOCKDOWN
     DEBUG_FS=, refers to LOCKDOWN
     NOTIFIER_ERROR_INJECTION=
+    X86_PTDUMP=
 
 reason: maintainer, cut_attack_surface
     DRM_LEGACY=
     FB=
     VT=
 
-reason: lockdown, cut_attack_surface
-    ACPI_TABLE_UPGRADE=, refers to LOCKDOWN
-    X86_IOPL_IOPERM=, refers to LOCKDOWN
-    EFI_TEST=, refers to LOCKDOWN
-    BPF_SYSCALL=, refers to LOCKDOWN
-    MMIOTRACE_TEST=, refers to LOCKDOWN
+reason: grapheneos, cut_attack_surface
+    AIO=
 
 reason: clipos, cut_attack_surface
     STAGING=
@@ -231,13 +228,18 @@ reason: clipos, cut_attack_surface
     USER_NS=, user.max_user_namespaces=0
     X86_MSR=, refers to LOCKDOWN
     X86_CPUID=
+    IO_URING=
+    X86_IOPL_IOPERM=, refers to LOCKDOWN
     and: LDISC_AUTOLOAD=
          presence=LDISC_AUTOLOAD
     arch: X86_64, X86_32
         X86_INTEL_TSX_MODE_OFF=y, tsx=off
 
-reason: grapheneos, cut_attack_surface
-    AIO=
+reason: lockdown, cut_attack_surface
+    ACPI_TABLE_UPGRADE=, refers to LOCKDOWN
+    EFI_TEST=, refers to LOCKDOWN
+    BPF_SYSCALL=, refers to LOCKDOWN
+    MMIOTRACE_TEST=, refers to LOCKDOWN
 
 reason: my, cut_attack_surface
     MMIOTRACE=, refers to LOCKDOWN (permissive)

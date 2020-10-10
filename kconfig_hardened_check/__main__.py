@@ -63,8 +63,7 @@ def main2(args):
         error_count = len(list(filter(lambda opt: opt.result.startswith('FAIL'), config_checklist)))
         ok_count = len(list(filter(lambda opt: opt.result.startswith('OK'), config_checklist)))
         if not debug_mode and not json_mode:
-            print('[+] config check is finished: \'OK\' - {} / \'FAIL\' - {}'.format(ok_count, error_count))
-        #sys.exit(0)
+            print(f'[+] Config check is finished: \'OK\' - {ok_count} / \'FAIL\' - {error_count}')
         return
 
     if args.print:

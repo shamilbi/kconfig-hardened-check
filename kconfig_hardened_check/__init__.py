@@ -82,7 +82,7 @@ def detect_arch(fname):
         arch_pattern = re.compile("CONFIG_[a-zA-Z0-9_]*=y")
         arch = None
         if not Env.json_mode:
-            print('[+] Trying to detect architecture in "{}"...'.format(fname))
+            print(f'[+] Config file to check: {fname}')
         for line in f.readlines():
             if arch_pattern.match(line):
                 option, _ = line[7:].split('=', 1)
@@ -99,13 +99,9 @@ def detect_arch(fname):
 def detect_version(fname):
     with open(fname, 'r') as f:
         ver_pattern = re.compile("# Linux/.* Kernel Configuration")
-        if not Env.json_mode:
-            print('[+] Trying to detect kernel version in "{}"...'.format(fname))
         for line in f:
             if ver_pattern.match(line):
                 line = line.strip()
-                if not Env.json_mode:
-                    print('[+] Found version line: "{}"'.format(line))
                 parts = line.split()
                 ver_str = parts[2]
                 ver_numbers = ver_str.split('.')[:3]
@@ -170,8 +166,6 @@ def check_config_file(checklist, fname, arch):
         opt_is_on = re.compile("CONFIG_[a-zA-Z0-9_]*=[a-zA-Z0-9_\"]*")
         opt_is_off = re.compile("# CONFIG_[a-zA-Z0-9_]* is not set")
 
-        if not Env.json_mode:
-            print('[+] Checking "{}" against {} hardening preferences...'.format(fname, arch))
         for line in f.readlines():
             line = line.strip()
             option = None
