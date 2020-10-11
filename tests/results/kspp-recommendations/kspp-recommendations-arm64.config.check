@@ -1,9 +1,6 @@
-[+] Trying to detect architecture in "kspp-recommendations-arm64.config"...
+[+] Config file to check: kspp-recommendations-arm64.config
 [+] Detected architecture: ARM64
-[+] Trying to detect kernel version in "kspp-recommendations-arm64.config"...
-[+] Found version line: "# Linux/arm64 5.4.0 Kernel Configuration"
 [+] Detected kernel version: 5.4.0
-[+] Checking "kspp-recommendations-arm64.config" against ARM64 hardening preferences...
 =========================================================================================================================
                  option name                 | desired val | decision |       reason       |   check result
 =========================================================================================================================
@@ -53,6 +50,7 @@ CONFIG_DEFAULT_MMAP_MIN_ADDR                 |    32768    |   kspp   |  self_pr
 CONFIG_SECURITY_DMESG_RESTRICT               |      y      |  clipos  |  self_protection   |   FAIL: not found
 CONFIG_DEBUG_VIRTUAL                         |      y      |  clipos  |  self_protection   |   FAIL: not found
 CONFIG_STATIC_USERMODEHELPER                 |      y      |  clipos  |  self_protection   |   FAIL: not found
+CONFIG_EFI_DISABLE_PCI_DMA                   |      y      |  clipos  |  self_protection   |   FAIL: not found
 CONFIG_SLAB_MERGE_DEFAULT                    | is not set  |  clipos  |  self_protection   |   OK: not found
 CONFIG_RANDOM_TRUST_BOOTLOADER               | is not set  |  clipos  |  self_protection   |   OK: not found
 CONFIG_RANDOM_TRUST_CPU                      | is not set  |  clipos  |  self_protection   |   OK: not found
@@ -69,7 +67,7 @@ CONFIG_SECURITY_LOCKDOWN_LSM_EARLY           |      y      |  clipos  |  securit
 CONFIG_LOCK_DOWN_KERNEL_FORCE_CONFIDENTIALITY|      y      |  clipos  |  security_policy   |   FAIL: not found
 CONFIG_SECURITY_SAFESETID                    |      y      |    my    |  security_policy   |   FAIL: not found
 CONFIG_SECURITY_LOADPIN                      |      y      |    my    |  security_policy   |   FAIL: not found
-CONFIG_SECURITY_LOADPIN_ENFORCE              |      y      |    my    |  security_policy   |   FAIL: CONFIG_SECURITY_LOADPIN is needed
+CONFIG_SECURITY_LOADPIN_ENFORCE              |      y      |    my    |  security_policy   |   FAIL: CONFIG_SECURITY_LOADPIN not "y"
 CONFIG_SECCOMP                               |      y      |defconfig | cut_attack_surface |   OK
 CONFIG_SECCOMP_FILTER                        |      y      |defconfig | cut_attack_surface |   OK
 CONFIG_STRICT_DEVMEM                         |      y      |defconfig | cut_attack_surface |   OK
@@ -90,7 +88,6 @@ CONFIG_OABI_COMPAT                           | is not set  |   kspp   | cut_atta
 CONFIG_MODULES                               | is not set  |   kspp   | cut_attack_surface |   OK
 CONFIG_DEVMEM                                | is not set  |   kspp   | cut_attack_surface |   OK
 CONFIG_IO_STRICT_DEVMEM                      |      y      |   kspp   | cut_attack_surface |   OK
-CONFIG_X86_PTDUMP                            | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_ZSMALLOC_STAT                         | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_PAGE_OWNER                            | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_DEBUG_KMEMLEAK                        | is not set  |grsecurity| cut_attack_surface |   OK: not found
@@ -108,14 +105,11 @@ CONFIG_MEM_SOFT_DIRTY                        | is not set  |grsecurity| cut_atta
 CONFIG_DEVPORT                               | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_DEBUG_FS                              | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_NOTIFIER_ERROR_INJECTION              | is not set  |grsecurity| cut_attack_surface |   OK: not found
+CONFIG_X86_PTDUMP                            | is not set  |grsecurity| cut_attack_surface |   OK: not found
 CONFIG_DRM_LEGACY                            | is not set  |maintainer| cut_attack_surface |   OK: not found
 CONFIG_FB                                    | is not set  |maintainer| cut_attack_surface |   OK: not found
 CONFIG_VT                                    | is not set  |maintainer| cut_attack_surface |   OK: not found
-CONFIG_ACPI_TABLE_UPGRADE                    | is not set  | lockdown | cut_attack_surface |   OK: not found
-CONFIG_X86_IOPL_IOPERM                       | is not set  | lockdown | cut_attack_surface |   OK: not found
-CONFIG_EFI_TEST                              | is not set  | lockdown | cut_attack_surface |   OK: not found
-CONFIG_BPF_SYSCALL                           | is not set  | lockdown | cut_attack_surface |   OK: not found
-CONFIG_MMIOTRACE_TEST                        | is not set  | lockdown | cut_attack_surface |   OK: not found
+CONFIG_AIO                                   | is not set  |grapheneos| cut_attack_surface |   OK: not found
 CONFIG_STAGING                               | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_KSM                                   | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_KALLSYMS                              | is not set  |  clipos  | cut_attack_surface |   OK: not found
@@ -125,8 +119,13 @@ CONFIG_KEXEC_FILE                            | is not set  |  clipos  | cut_atta
 CONFIG_USER_NS                               | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_X86_MSR                               | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_X86_CPUID                             | is not set  |  clipos  | cut_attack_surface |   OK: not found
+CONFIG_IO_URING                              | is not set  |  clipos  | cut_attack_surface |   OK: not found
+CONFIG_X86_IOPL_IOPERM                       | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_LDISC_AUTOLOAD                        | is not set  |  clipos  | cut_attack_surface |   FAIL: not present
-CONFIG_AIO                                   | is not set  |grapheneos| cut_attack_surface |   OK: not found
+CONFIG_ACPI_TABLE_UPGRADE                    | is not set  | lockdown | cut_attack_surface |   OK: not found
+CONFIG_EFI_TEST                              | is not set  | lockdown | cut_attack_surface |   OK: not found
+CONFIG_BPF_SYSCALL                           | is not set  | lockdown | cut_attack_surface |   OK: not found
+CONFIG_MMIOTRACE_TEST                        | is not set  | lockdown | cut_attack_surface |   OK: not found
 CONFIG_MMIOTRACE                             | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_LIVEPATCH                             | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_IP_DCCP                               | is not set  |    my    | cut_attack_surface |   OK: not found
@@ -138,4 +137,4 @@ CONFIG_INPUT_EVBUG                           | is not set  |    my    | cut_atta
 CONFIG_INTEGRITY                             |      y      |defconfig |userspace_hardening |   FAIL: not found
 CONFIG_ARCH_MMAP_RND_BITS                    |     32      |  clipos  |userspace_hardening |   FAIL: not found
 
-[+] config check is finished: 'OK' - 109 / 'FAIL' - 21
+[+] Config check is finished: 'OK' - 110 / 'FAIL' - 22
