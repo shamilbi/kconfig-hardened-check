@@ -252,7 +252,14 @@ reason: my, cut_attack_surface
     INPUT_EVBUG=, Can be used as a keylogger
 
 reason: defconfig, userspace_hardening
-    INTEGRITY=y
+    arch: X86_64, ARM64, X86_32
+        INTEGRITY=y
+
+reason: my, userspace_hardening
+    arch: ARM
+        INTEGRITY=y
+
+reason: defconfig, userspace_hardening
     arch: ARM, X86_32
         VMSPLIT_3G=y
 
