@@ -8,9 +8,10 @@ from kconfig_hardened_check import (
     check_config_file, print_checklist)
 
 
-def construct_checklist(checklist, arch):
-    parser = Parser(arch, checklist, 'rules.txt')
+def construct_checklist(arch):
+    parser = Parser(arch, 'rules.txt')
     parser.parse()
+    return parser.checklist
 
 
 def main():
@@ -32,8 +33,6 @@ def main():
 
 
 def main2(args):
-    config_checklist = []
-
     if args.debug:
         Env.debug_mode = True
         print('[!] WARNING: debug mode is enabled')
@@ -59,7 +58,7 @@ def main2(args):
             vstr = '.'.join(str(i) for i in kernel_version)
             print(f'[+] Detected kernel version: {vstr}')
 
-        construct_checklist(config_checklist, arch)
+        config_checklist = construct_checklist(arch)
         check_config_file(config_checklist, args.config)
         error_count = len(list(filter(lambda opt: opt.result.startswith('FAIL'), config_checklist)))
         ok_count = len(list(filter(lambda opt: opt.result.startswith('OK'), config_checklist)))
@@ -69,7 +68,7 @@ def main2(args):
 
     if args.print:
         arch = args.print
-        construct_checklist(config_checklist, arch)
+        config_checklist = construct_checklist(arch)
         if not json_mode:
             print('[+] Printing kernel hardening preferences for {}...'.format(arch))
         print_checklist(config_checklist, False)

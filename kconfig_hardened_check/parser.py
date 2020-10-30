@@ -71,10 +71,10 @@ class Parser:
     CHECK_RE_2 = re.compile(r'=([^ ,]*)')
     # =y
 
-    def __init__(self, arch, checklist, rpath):
+    def __init__(self, arch, rpath):
         'rpath = module.file'
         self.arch = arch
-        self.checklist = checklist
+        self.checklist = []
         self.rpath = rpath
         self.skip_level = 0
         self.reason = None
