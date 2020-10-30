@@ -2,9 +2,10 @@
 
 import sys
 from argparse import ArgumentParser
-from .parser import Parser
-from . import (__version__, Env, supported_archs, detect_arch, detect_version,
-               check_config_file, print_checklist)
+from kconfig_hardened_check.parser import Parser
+from kconfig_hardened_check import (
+    __version__, Env, supported_archs, detect_arch, detect_version,
+    check_config_file, print_checklist)
 
 
 def construct_checklist(checklist, arch):
@@ -59,7 +60,7 @@ def main2(args):
             print(f'[+] Detected kernel version: {vstr}')
 
         construct_checklist(config_checklist, arch)
-        check_config_file(config_checklist, args.config, arch)
+        check_config_file(config_checklist, args.config)
         error_count = len(list(filter(lambda opt: opt.result.startswith('FAIL'), config_checklist)))
         ok_count = len(list(filter(lambda opt: opt.result.startswith('OK'), config_checklist)))
         if not debug_mode and not json_mode:

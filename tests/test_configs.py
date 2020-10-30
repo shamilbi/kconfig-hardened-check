@@ -1,5 +1,5 @@
 from kconfig_hardened_check.__main__ import main2
-from . import list_configs, Args, cd_dir
+from tests import list_configs, Args, cd_dir
 
 
 def test_configs(capsys):

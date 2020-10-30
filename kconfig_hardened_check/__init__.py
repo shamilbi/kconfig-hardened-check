@@ -58,9 +58,9 @@ import sys
 from collections import OrderedDict
 import re
 import json
-from .__about__ import __version__
+from kconfig_hardened_check.__about__ import __version__
 
-# pylint: disable=line-too-long,bad-whitespace,too-many-branches
+# pylint: disable=line-too-long,too-many-branches
 # pylint: disable=too-many-statements,global-statement
 
 supported_archs = ['X86_64', 'X86_32', 'ARM64', 'ARM']
@@ -160,7 +160,7 @@ def perform_checks(checklist, parsed_options):
         opt.check()
 
 
-def check_config_file(checklist, fname, arch):
+def check_config_file(checklist, fname):
     with open(fname, 'r') as f:
         parsed_options = OrderedDict()
         opt_is_on = re.compile("CONFIG_[a-zA-Z0-9_]*=[a-zA-Z0-9_\"]*")
