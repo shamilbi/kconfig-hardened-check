@@ -1,6 +1,6 @@
 import re
 from importlib.resources import open_text
-from .check import OptCheck, VerCheck, OR, AND, PresenceCheck
+from kconfig_hardened_check.check import OptCheck, VerCheck, OR, AND, PresenceCheck
 
 # pylint: disable=too-many-instance-attributes
 

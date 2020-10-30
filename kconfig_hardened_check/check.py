@@ -1,7 +1,7 @@
 # pylint: disable=line-too-long
 
 import sys
-from . import Env
+from kconfig_hardened_check import Env
 
 # pylint: disable=global-at-module-level
 
