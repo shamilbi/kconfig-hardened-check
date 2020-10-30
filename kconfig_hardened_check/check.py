@@ -64,7 +64,7 @@ class PresenceCheck:
 
     def check(self):
         if self.state is None:
-            self.result = 'FAIL: not present'
+            self.result = f'FAIL: CONFIG_{self.name} not present'
             return False, self.result
         self.result = 'OK: is present'
         return True, self.result

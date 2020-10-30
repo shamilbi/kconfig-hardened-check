@@ -17,6 +17,7 @@ CONFIG_UNMAP_KERNEL_AT_EL0                   |      y      |defconfig |  self_pr
 CONFIG_HARDEN_EL2_VECTORS                    |      y      |defconfig |  self_protection   |   OK
 CONFIG_RODATA_FULL_DEFAULT_ENABLED           |      y      |defconfig |  self_protection   |   OK
 CONFIG_ARM64_PTR_AUTH                        |      y      |defconfig |  self_protection   |   OK
+CONFIG_ARM64_BTI_KERNEL                      |      y      |defconfig |  self_protection   |   FAIL: not found
 CONFIG_VMAP_STACK                            |      y      |defconfig |  self_protection   |   OK
 CONFIG_RANDOMIZE_BASE                        |      y      |defconfig |  self_protection   |   OK
 CONFIG_THREAD_INFO_IN_TASK                   |      y      |defconfig |  self_protection   |   OK
@@ -41,7 +42,7 @@ CONFIG_MODULE_SIG                            |      y      |   kspp   |  self_pr
 CONFIG_MODULE_SIG_ALL                        |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_MODULE_SIG_SHA512                     |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_MODULE_SIG_FORCE                      |      y      |   kspp   |  self_protection   |   FAIL: not found
-CONFIG_INIT_STACK_ALL                        |      y      |   kspp   |  self_protection   |   FAIL: not found
+CONFIG_INIT_STACK_ALL_ZERO                   |      y      |   kspp   |  self_protection   |   FAIL: not found
 CONFIG_INIT_ON_FREE_DEFAULT_ON               |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_GCC_PLUGIN_STACKLEAK                  |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
 CONFIG_ARM64_SW_TTBR0_PAN                    |      y      |   kspp   |  self_protection   |   FAIL: "is not set"
@@ -57,8 +58,10 @@ CONFIG_RANDOM_TRUST_CPU                      | is not set  |  clipos  |  self_pr
 CONFIG_GCC_PLUGIN_RANDSTRUCT_PERFORMANCE     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_RANDSTRUCT not "y"
 CONFIG_STACKLEAK_METRICS                     | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK not "y"
 CONFIG_STACKLEAK_RUNTIME_DISABLE             | is not set  |  clipos  |  self_protection   |   FAIL: CONFIG_GCC_PLUGIN_STACKLEAK not "y"
+CONFIG_UBSAN_BOUNDS                          |      y      |    my    |  self_protection   |   FAIL: CONFIG_UBSAN_TRAP not "y"
 CONFIG_SLUB_DEBUG_ON                         |      y      |    my    |  self_protection   |   FAIL: "is not set"
 CONFIG_RESET_ATTACK_MITIGATION               |      y      |    my    |  self_protection   |   FAIL: "is not set"
+CONFIG_SHADOW_CALL_STACK                     |      y      |    my    |  self_protection   |   FAIL: not found
 CONFIG_SECURITY                              |      y      |defconfig |  security_policy   |   OK
 CONFIG_SECURITY_YAMA                         |      y      |   kspp   |  security_policy   |   FAIL: "is not set"
 CONFIG_SECURITY_WRITABLE_HOOKS               | is not set  |    my    |  security_policy   |   OK: not found
@@ -121,20 +124,21 @@ CONFIG_X86_MSR                               | is not set  |  clipos  | cut_atta
 CONFIG_X86_CPUID                             | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_IO_URING                              | is not set  |  clipos  | cut_attack_surface |   FAIL: "y"
 CONFIG_X86_IOPL_IOPERM                       | is not set  |  clipos  | cut_attack_surface |   OK: not found
+CONFIG_ACPI_TABLE_UPGRADE                    | is not set  |  clipos  | cut_attack_surface |   FAIL: "y"
+CONFIG_EFI_CUSTOM_SSDT_OVERLAYS              | is not set  |  clipos  | cut_attack_surface |   OK: not found
 CONFIG_LDISC_AUTOLOAD                        | is not set  |  clipos  | cut_attack_surface |   FAIL: "y"
-CONFIG_ACPI_TABLE_UPGRADE                    | is not set  | lockdown | cut_attack_surface |   FAIL: "y"
 CONFIG_EFI_TEST                              | is not set  | lockdown | cut_attack_surface |   OK
 CONFIG_BPF_SYSCALL                           | is not set  | lockdown | cut_attack_surface |   OK
 CONFIG_MMIOTRACE_TEST                        | is not set  | lockdown | cut_attack_surface |   OK: not found
+CONFIG_TRIM_UNUSED_KSYMS                     |      y      |    my    | cut_attack_surface |   FAIL: "is not set"
 CONFIG_MMIOTRACE                             | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_LIVEPATCH                             | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_IP_DCCP                               | is not set  |    my    | cut_attack_surface |   OK
 CONFIG_IP_SCTP                               | is not set  |    my    | cut_attack_surface |   OK
 CONFIG_FTRACE                                | is not set  |    my    | cut_attack_surface |   OK
-CONFIG_BPF_JIT                               | is not set  |    my    | cut_attack_surface |   FAIL: "y"
 CONFIG_VIDEO_VIVID                           | is not set  |    my    | cut_attack_surface |   OK: not found
 CONFIG_INPUT_EVBUG                           | is not set  |    my    | cut_attack_surface |   OK
 CONFIG_INTEGRITY                             |      y      |defconfig |userspace_hardening |   OK
 CONFIG_ARCH_MMAP_RND_BITS                    |     32      |  clipos  |userspace_hardening |   FAIL: "18"
 
-[+] Config check is finished: 'OK' - 65 / 'FAIL' - 67
+[+] Config check is finished: 'OK' - 66 / 'FAIL' - 70

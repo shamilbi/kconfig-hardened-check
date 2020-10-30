@@ -38,8 +38,12 @@ reason: defconfig, self_protection
         ARM64_PAN=y
         UNMAP_KERNEL_AT_EL0=y
         HARDEN_EL2_VECTORS=y
+        #or: HARDEN_EL2_VECTORS=y
+        #    and: RANDOMIZE_BASE=y
+        #         version=5.9, HARDEN_EL2_VECTORS was included in RANDOMIZE_BASE in v5.9
         RODATA_FULL_DEFAULT_ENABLED=y
         ARM64_PTR_AUTH=y
+        ARM64_BTI_KERNEL=y
     arch: X86_64, ARM64
         VMAP_STACK=y
     arch: X86_64, ARM64, X86_32
@@ -79,10 +83,10 @@ reason: kspp, self_protection
         modules_not_set
     or: MODULE_SIG_FORCE=y
         modules_not_set, refers to LOCKDOWN
-    or: INIT_STACK_ALL=y
+    or: INIT_STACK_ALL_ZERO=y
         GCC_PLUGIN_STRUCTLEAK_BYREF_ALL=y
     or: INIT_ON_FREE_DEFAULT_ON=y
-        PAGE_POISONING=y, before v5.3
+        PAGE_POISONING_ZERO=y, before v5.3
     arch: X86_64, ARM64, X86_32
         stackleak_is_set: GCC_PLUGIN_STACKLEAK=y
         stackleak_is_set
@@ -125,11 +129,16 @@ reason: clipos, self_protection
              iommu_support_is_set
 
 reason: my, self_protection
+    and: UBSAN_BOUNDS=y
+         UBSAN_MISC=
+         UBSAN_TRAP=y
     SLUB_DEBUG_ON=y
     RESET_ATTACK_MITIGATION=y, needs userspace support (systemd)
     arch: X86_64
         and: AMD_IOMMU_V2=y
              iommu_support_is_set
+    arch: ARM64
+        SHADOW_CALL_STACK=y
 
 reason: defconfig, security_policy
     arch: X86_64, ARM64, X86_32
@@ -230,24 +239,25 @@ reason: clipos, cut_attack_surface
     X86_CPUID=
     IO_URING=
     X86_IOPL_IOPERM=, refers to LOCKDOWN
+    ACPI_TABLE_UPGRADE=, refers to LOCKDOWN
+    EFI_CUSTOM_SSDT_OVERLAYS=
     and: LDISC_AUTOLOAD=
          presence=LDISC_AUTOLOAD
     arch: X86_64, X86_32
         X86_INTEL_TSX_MODE_OFF=y, tsx=off
 
 reason: lockdown, cut_attack_surface
-    ACPI_TABLE_UPGRADE=, refers to LOCKDOWN
     EFI_TEST=, refers to LOCKDOWN
     BPF_SYSCALL=, refers to LOCKDOWN
     MMIOTRACE_TEST=, refers to LOCKDOWN
 
 reason: my, cut_attack_surface
+    TRIM_UNUSED_KSYMS=y
     MMIOTRACE=, refers to LOCKDOWN (permissive)
     LIVEPATCH=
     IP_DCCP=
     IP_SCTP=
     FTRACE=, refers to LOCKDOWN
-    BPF_JIT=
     VIDEO_VIVID=
     INPUT_EVBUG=, Can be used as a keylogger
 
