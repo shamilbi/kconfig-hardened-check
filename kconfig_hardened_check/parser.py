@@ -6,8 +6,7 @@ from kconfig_hardened_check.check import OptCheck, VerCheck, OR, AND, PresenceCh
 
 
 class Reason:
-    def __init__(self, checklist, decision, reason):
-        self.checklist = checklist
+    def __init__(self, decision, reason):
         self.decision = decision
         self.reason = reason
 
@@ -33,18 +32,6 @@ class Reason:
         'checks = (name, expected), OptCheck(), ...'
         l = list(self._scan_checks(*checks))
         check = AND(*l)
-        return check
-
-    def add_or(self, *checks):
-        'checks = (name, expected), OptCheck(), ...'
-        check = self.create_or(*checks)
-        self.checklist.append(check)
-        return check
-
-    def add_and(self, *checks):
-        'checks = (name, expected), OptCheck(), ...'
-        check = self.create_and(*checks)
-        self.checklist.append(check)
         return check
 
 
@@ -121,7 +108,7 @@ class Parser:
             m = self.REASON_RE.match(self.line)
             if not m:
                 self.error('bad reason')
-            self.reason = Reason(self.checklist, m.group(1), m.group(2))
+            self.reason = Reason(m.group(1), m.group(2))
         else:
             if not self.reason:
                 self.error('reason not found')
@@ -147,11 +134,11 @@ class Parser:
             if not self.check_arch(rest):
                 self.skip_level = self.level
         elif var == 'or':
-            self.cond = self.reason.add_or
+            self.cond = self.reason.create_or
             self.cond_level = self.level
             self.parse_check(rest)
         elif var == 'and':
-            self.cond = self.reason.add_and
+            self.cond = self.reason.create_and
             self.cond_level = self.level
             self.parse_check(rest)
         else:
@@ -165,7 +152,8 @@ class Parser:
         if self.cond:
             if not self.cond_checks:
                 self.error('bad condition (or, and)')
-            self.cond(*self.cond_checks)
+            check = self.cond(*self.cond_checks)
+            self.checklist.append(check)
         self.cond = None
         self.cond_checks = []
 
