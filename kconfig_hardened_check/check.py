@@ -27,8 +27,8 @@ class OptCheck:
             self.result = 'FAIL: "' + self.state + '"'
 
         if self.result.startswith('OK'):
-            return True, self.result
-        return False, self.result
+            return True
+        return False
 
     def table_print(self, with_results):
         print('CONFIG_{:<38}|{:^13}|{:^10}|{:^20}'.format(self.name, self.expected, self.decision, self.reason), end='')
@@ -45,9 +45,9 @@ class VerCheck:
     def check(self):
         if Env.kernel_version >= self.ver_expected:
             self.result = f'OK: version >= {self.exp_str}'
-            return True, self.result
+            return True
         self.result = f'FAIL: version < {self.exp_str}'
-        return False, self.result
+        return False
 
     def table_print(self, with_results):
         ver_req = f'kernel version >= {self.exp_str}'
@@ -65,9 +65,9 @@ class PresenceCheck:
     def check(self):
         if self.state is None:
             self.result = f'FAIL: CONFIG_{self.name} not present'
-            return False, self.result
+            return False
         self.result = 'OK: is present'
-        return True, self.result
+        return True
 
     def table_print(self, with_results):
         print('CONFIG_{:<84}'.format(self.name + ' is present'), end='')
@@ -126,15 +126,15 @@ class OR(ComplexOptCheck):
             sys.exit('[!] ERROR: invalid OR check')
 
         for i, opt in enumerate(self.opts):
-            ret, _ = opt.check()
+            ret = opt.check()
             if ret:
                 if i == 0 or not hasattr(opt, 'expected'):
                     self.result = opt.result
                 else:
                     self.result = 'OK: CONFIG_{} "{}"'.format(opt.name, opt.expected)
-                return True, self.result
+                return True
         self.result = self.opts[0].result
-        return False, self.result
+        return False
 
 
 class AND(ComplexOptCheck):
@@ -144,15 +144,15 @@ class AND(ComplexOptCheck):
 
     def check(self):
         for i, opt in reversed(list(enumerate(self.opts))):
-            ret, _ = opt.check()
+            ret = opt.check()
             if i == 0:
                 self.result = opt.result
-                return ret, self.result
+                return ret
             if not ret:
                 if hasattr(opt, 'expected'):
                     self.result = f'FAIL: CONFIG_{opt.name} not "{opt.expected}"'
                 else:
                     self.result = opt.result
-                return False, self.result
+                return False
 
         sys.exit('[!] ERROR: invalid AND check')
