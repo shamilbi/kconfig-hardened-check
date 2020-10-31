@@ -60,6 +60,7 @@ import re
 import json
 from kconfig_hardened_check.__about__ import __version__
 from kconfig_hardened_check.env import Env
+from kconfig_hardened_check.check import check_x
 
 # pylint: disable=line-too-long,too-many-branches
 # pylint: disable=too-many-statements,global-statement
@@ -137,17 +138,18 @@ def print_checklist(checklist, with_results):
 
 def perform_checks(checklist, parsed_options):
     for opt in checklist:
-        if hasattr(opt, 'opts'):
-            # prepare ComplexOptCheck
-            for o in opt.opts:
-                if hasattr(o, 'state'):
-                    o.state = parsed_options.get(o.name, None)
-        else:
-            # prepare simple check
-            if not hasattr(opt, 'state'):
-                sys.exit('[!] ERROR: bad simple check {}'.format(vars(opt)))
-            opt.state = parsed_options.get(opt.name, None)
-        opt.check()
+        #if hasattr(opt, 'opts'):
+        #    # prepare ComplexOptCheck
+        #    for o in opt.opts:
+        #        if hasattr(o, 'state'):
+        #            o.state = parsed_options.get(o.name, None)
+        #else:
+        #    # prepare simple check
+        #    if not hasattr(opt, 'state'):
+        #        sys.exit('[!] ERROR: bad simple check {}'.format(vars(opt)))
+        #    opt.state = parsed_options.get(opt.name, None)
+        #opt.check()
+        check_x(opt, parsed_options)
 
 
 def check_config_file(checklist, fname):

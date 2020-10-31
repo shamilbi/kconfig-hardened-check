@@ -6,6 +6,14 @@ from kconfig_hardened_check.env import Env
 # pylint: disable=global-at-module-level
 
 
+def check_x(c, d: dict):
+    if isinstance(c, (OptCheck, PresenceCheck, ComplexOptCheck)):
+        return c.check(d)
+    if isinstance(c, VerCheck):
+        return c.check(Env.kernel_version)
+    return False
+
+
 class OptCheck:
     def __init__(self, name, expected, decision, reason):
         self.name = name
@@ -15,7 +23,8 @@ class OptCheck:
         self.state = None
         self.result = None
 
-    def check(self):
+    def check(self, d: dict):
+        self.state = d.get(self.name, None)
         if self.expected == self.state:
             self.result = 'OK'
         elif self.state is None:
@@ -42,8 +51,8 @@ class VerCheck:
         self.result = None
         self.exp_str = '.'.join(str(i) for i in self.ver_expected)
 
-    def check(self):
-        if Env.kernel_version >= self.ver_expected:
+    def check(self, kernel_version: tuple):
+        if kernel_version >= self.ver_expected:
             self.result = f'OK: version >= {self.exp_str}'
             return True
         self.result = f'FAIL: version < {self.exp_str}'
@@ -62,7 +71,8 @@ class PresenceCheck:
         self.state = None
         self.result = None
 
-    def check(self):
+    def check(self, d: dict):
+        self.state = d.get(self.name, None)
         if self.state is None:
             self.result = f'FAIL: CONFIG_{self.name} not present'
             return False
@@ -121,12 +131,12 @@ class OR(ComplexOptCheck):
     #     OR(<X_is_hardened>, <X_is_disabled>)
     #     OR(<X_is_hardened>, <X_is_hardened_old>)
 
-    def check(self):
+    def check(self, d:dict):
         if not self.opts:
             sys.exit('[!] ERROR: invalid OR check')
 
         for i, opt in enumerate(self.opts):
-            ret = opt.check()
+            ret = check_x(opt, d)
             if ret:
                 if i == 0 or not hasattr(opt, 'expected'):
                     self.result = opt.result
@@ -142,9 +152,9 @@ class AND(ComplexOptCheck):
     # Use case: AND(<suboption>, <main_option>)
     # Suboption is not checked if checking of the main_option is failed.
 
-    def check(self):
+    def check(self, d: dict):
         for i, opt in reversed(list(enumerate(self.opts))):
-            ret = opt.check()
+            ret = check_x(opt, d)
             if i == 0:
                 self.result = opt.result
                 return ret
