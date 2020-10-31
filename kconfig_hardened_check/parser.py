@@ -52,11 +52,26 @@ class Condition:
         self.createF = d[op]
         self.checks = []
 
-    def add_check(self, check):
-        self.checks.append(check)
+    def add_check(self, check, level: int):
+        for c in reversed(self.checks):
+            if isinstance(c, Condition):
+                if level > c.level:
+                    c.add_check(check, level)
+                    break
+                if level == c.level and not c.checks:
+                    c.add_check(check, level)
+                    break
+        else:
+            self.checks.append(check)
 
     def create(self):
-        return self.createF(*self.checks)
+        checks = []
+        for c in self.checks:
+            if isinstance(c, Condition):
+                checks.append(c.create())
+            else:
+                checks.append(c)
+        return self.createF(*checks)
 
 
 class Parser:
@@ -142,13 +157,15 @@ class Parser:
         rest = m.group(2).lstrip()
         if var == 'reason':
             self.error('bad indent (reason)')
-        if self.cond and var in ('arch', 'or', 'and'):
-            self.error('nested conditions')
         if var == 'arch':
             if not self.check_arch(rest):
                 self.skip_level = self.level
         elif var in ('or', 'and'):
-            self.cond = Condition(self.reason, self.level, var)
+            cond = Condition(self.reason, self.level, var)
+            if self.cond:
+                self.cond.add_check(cond, self.level)
+            else:
+                self.cond = cond
             self.parse_check(rest)
         else:
             self.parse_check(rest, var)
@@ -197,7 +214,7 @@ class Parser:
                 self.error(f'var defined twice: {var}')
             self.var_d[var] = check
         elif self.cond:
-            self.cond.add_check(check)
+            self.cond.add_check(check, self.level)
         else:
             self.checklist.append(check)
 
