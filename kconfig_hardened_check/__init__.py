@@ -59,22 +59,12 @@ from collections import OrderedDict
 import re
 import json
 from kconfig_hardened_check.__about__ import __version__
+from kconfig_hardened_check.env import Env
 
 # pylint: disable=line-too-long,too-many-branches
 # pylint: disable=too-many-statements,global-statement
 
 supported_archs = ['X86_64', 'X86_32', 'ARM64', 'ARM']
-
-
-class Env:
-    # debug_mode enables:
-    #    - reporting about unknown kernel options in the config,
-    #    - verbose printing of ComplexOptChecks (OR, AND).
-    debug_mode = False
-
-    # json_mode is for printing results in JSON format
-    json_mode = False
-    kernel_version = None
 
 
 def detect_arch(fname):
