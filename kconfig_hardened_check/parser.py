@@ -43,6 +43,22 @@ def split_by_comma(s):
     return [i.strip() for i in s.split(',')]
 
 
+class Condition:
+    def __init__(self, reason: Reason, level: int, op: str):
+        self.reason = reason
+        self.level = level
+        d = {'or': self.reason.create_or,
+             'and': self.reason.create_and}
+        self.createF = d[op]
+        self.checks = []
+
+    def add_check(self, check):
+        self.checks.append(check)
+
+    def create(self):
+        return self.createF(*self.checks)
+
+
 class Parser:
     LEVEL_RE = re.compile(r'( *)')
     WORD = '[a-z_]+'
@@ -64,10 +80,8 @@ class Parser:
         self.checklist = []
         self.rpath = rpath
         self.skip_level = 0
-        self.reason = None
-        self.cond = None
-        self.cond_level = 0
-        self.cond_checks = []
+        self.reason: Reason = None
+        self.cond: Condition = None
         self.count = 0
         self.line = ''
         self.level = 0
@@ -112,7 +126,7 @@ class Parser:
         else:
             if not self.reason:
                 self.error('reason not found')
-            if self.cond and self.level <= self.cond_level:
+            if self.cond and self.level <= self.cond.level:
                 self.create_cond()
             m = self.VAR_RE.match(self.line)
             if m:
@@ -133,13 +147,8 @@ class Parser:
         if var == 'arch':
             if not self.check_arch(rest):
                 self.skip_level = self.level
-        elif var == 'or':
-            self.cond = self.reason.create_or
-            self.cond_level = self.level
-            self.parse_check(rest)
-        elif var == 'and':
-            self.cond = self.reason.create_and
-            self.cond_level = self.level
+        elif var in ('or', 'and'):
+            self.cond = Condition(self.reason, self.level, var)
             self.parse_check(rest)
         else:
             self.parse_check(rest, var)
@@ -150,12 +159,11 @@ class Parser:
 
     def create_cond(self):
         if self.cond:
-            if not self.cond_checks:
+            if not self.cond.checks:
                 self.error('bad condition (or, and)')
-            check = self.cond(*self.cond_checks)
+            check = self.cond.create()
             self.checklist.append(check)
         self.cond = None
-        self.cond_checks = []
 
     def parse_check(self, line, var=None):
         m = self.CHECK_RE_1.match(line)
@@ -189,7 +197,7 @@ class Parser:
                 self.error(f'var defined twice: {var}')
             self.var_d[var] = check
         elif self.cond:
-            self.cond_checks.append(check)
+            self.cond.add_check(check)
         else:
             self.checklist.append(check)
 
