@@ -9,4 +9,8 @@ class Env:
 
     # json_mode is for printing results in JSON format
     json_mode = False
+
     kernel_version = None
+
+    # parsed config options
+    kernel_config: dict = None

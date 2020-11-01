@@ -1,20 +1,20 @@
 # pylint: disable=line-too-long
 
 import sys
+from typing import List
+from abc import ABC, abstractmethod
 from kconfig_hardened_check.env import Env
 
 # pylint: disable=global-at-module-level
 
 
-def check_x(c, d: dict):
-    if isinstance(c, (OptCheck, PresenceCheck, ComplexOptCheck)):
-        return c.check(d)
-    if isinstance(c, VerCheck):
-        return c.check(Env.kernel_version)
-    return False
+class Check(ABC):
+    @abstractmethod
+    def check(self) -> bool:
+        pass
 
 
-class OptCheck:
+class OptCheck(Check):
     def __init__(self, name, expected, decision, reason):
         self.name = name
         self.expected = expected
@@ -23,8 +23,8 @@ class OptCheck:
         self.state = None
         self.result = None
 
-    def check(self, d: dict):
-        self.state = d.get(self.name, None)
+    def check(self):
+        self.state = Env.kernel_config.get(self.name, None)
         if self.expected == self.state:
             self.result = 'OK'
         elif self.state is None:
@@ -45,14 +45,14 @@ class OptCheck:
             print('|   {}'.format(self.result), end='')
 
 
-class VerCheck:
+class VerCheck(Check):
     def __init__(self, ver_expected):
         self.ver_expected = ver_expected
         self.result = None
         self.exp_str = '.'.join(str(i) for i in self.ver_expected)
 
-    def check(self, kernel_version: tuple):
-        if kernel_version >= self.ver_expected:
+    def check(self):
+        if Env.kernel_version >= self.ver_expected:
             self.result = f'OK: version >= {self.exp_str}'
             return True
         self.result = f'FAIL: version < {self.exp_str}'
@@ -65,14 +65,14 @@ class VerCheck:
             print('|   {}'.format(self.result), end='')
 
 
-class PresenceCheck:
+class PresenceCheck(Check):
     def __init__(self, name):
         self.name = name
         self.state = None
         self.result = None
 
-    def check(self, d: dict):
-        self.state = d.get(self.name, None)
+    def check(self):
+        self.state = Env.kernel_config.get(self.name, None)
         if self.state is None:
             self.result = f'FAIL: CONFIG_{self.name} not present'
             return False
@@ -86,7 +86,7 @@ class PresenceCheck:
 
 
 class ComplexOptCheck:
-    def __init__(self, *opts):
+    def __init__(self, *opts: List[Check]):
         self.opts = opts
         self.result = None
 
@@ -125,18 +125,18 @@ class ComplexOptCheck:
                 print('|   {}'.format(self.result), end='')
 
 
-class OR(ComplexOptCheck):
+class OR(ComplexOptCheck, Check):
     # self.opts[0] is the option that this OR-check is about.
     # Use case:
     #     OR(<X_is_hardened>, <X_is_disabled>)
     #     OR(<X_is_hardened>, <X_is_hardened_old>)
 
-    def check(self, d:dict):
+    def check(self):
         if not self.opts:
             sys.exit('[!] ERROR: invalid OR check')
 
         for i, opt in enumerate(self.opts):
-            ret = check_x(opt, d)
+            ret = opt.check()
             if ret:
                 if i == 0 or not hasattr(opt, 'expected'):
                     self.result = opt.result
@@ -147,14 +147,14 @@ class OR(ComplexOptCheck):
         return False
 
 
-class AND(ComplexOptCheck):
+class AND(ComplexOptCheck, Check):
     # self.opts[0] is the option that this AND-check is about.
     # Use case: AND(<suboption>, <main_option>)
     # Suboption is not checked if checking of the main_option is failed.
 
-    def check(self, d: dict):
+    def check(self):
         for i, opt in reversed(list(enumerate(self.opts))):
-            ret = check_x(opt, d)
+            ret = opt.check()
             if i == 0:
                 self.result = opt.result
                 return ret

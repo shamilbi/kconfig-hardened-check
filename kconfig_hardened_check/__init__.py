@@ -58,9 +58,10 @@ import sys
 from collections import OrderedDict
 import re
 import json
+from typing import List
 from kconfig_hardened_check.__about__ import __version__
 from kconfig_hardened_check.env import Env
-from kconfig_hardened_check.check import check_x
+from kconfig_hardened_check.check import Check
 
 # pylint: disable=line-too-long,too-many-branches
 # pylint: disable=too-many-statements,global-statement
@@ -136,7 +137,8 @@ def print_checklist(checklist, with_results):
     print()
 
 
-def perform_checks(checklist, parsed_options):
+def perform_checks(checklist: List[Check], parsed_options: dict):
+    Env.kernel_config = parsed_options
     for opt in checklist:
         #if hasattr(opt, 'opts'):
         #    # prepare ComplexOptCheck
@@ -148,8 +150,7 @@ def perform_checks(checklist, parsed_options):
         #    if not hasattr(opt, 'state'):
         #        sys.exit('[!] ERROR: bad simple check {}'.format(vars(opt)))
         #    opt.state = parsed_options.get(opt.name, None)
-        #opt.check()
-        check_x(opt, parsed_options)
+        opt.check()
 
 
 def check_config_file(checklist, fname):

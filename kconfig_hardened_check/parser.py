@@ -1,6 +1,8 @@
 import re
+from typing import List
 from importlib.resources import open_text
-from kconfig_hardened_check.check import OptCheck, VerCheck, OR, AND, PresenceCheck
+from kconfig_hardened_check.check import (
+    OptCheck, VerCheck, OR, AND, PresenceCheck, Check)
 
 # pylint: disable=too-many-instance-attributes
 
@@ -64,7 +66,7 @@ class Condition:
         else:
             self.checks.append(check)
 
-    def create(self):
+    def create(self) -> Check:
         checks = []
         for c in self.checks:
             if isinstance(c, Condition):
@@ -92,7 +94,7 @@ class Parser:
     def __init__(self, arch, rpath):
         'rpath = module.file'
         self.arch = arch
-        self.checklist = []
+        self.checklist: List[Check] = []
         self.rpath = rpath
         self.skip_level = 0
         self.reason: Reason = None
