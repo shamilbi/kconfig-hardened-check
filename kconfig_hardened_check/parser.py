@@ -3,6 +3,7 @@ from typing import List
 from importlib.resources import open_text
 from kconfig_hardened_check.check import (
     OptCheck, VerCheck, OR, AND, PresenceCheck, Check)
+from kconfig_hardened_check.env import Env
 
 # pylint: disable=too-many-instance-attributes
 
@@ -91,9 +92,8 @@ class Parser:
     CHECK_RE_2 = re.compile(r'=([^ ,]*)')
     # =y
 
-    def __init__(self, arch, rpath):
+    def __init__(self, rpath):
         'rpath = module.file'
-        self.arch = arch
         self.checklist: List[Check] = []
         self.rpath = rpath
         self.skip_level = 0
@@ -173,7 +173,7 @@ class Parser:
             self.parse_check(rest, var)
 
     def check_arch(self, rest):
-        return self.arch in split_by_comma(rest)
+        return Env.kernel_arch in split_by_comma(rest)
         # X86_64, X86_32
 
     def create_cond(self):

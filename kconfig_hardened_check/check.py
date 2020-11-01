@@ -5,8 +5,6 @@ from typing import List
 from abc import ABC, abstractmethod
 from kconfig_hardened_check.env import Env
 
-# pylint: disable=global-at-module-level
-
 
 class Check(ABC):
     @abstractmethod

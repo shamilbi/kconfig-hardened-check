@@ -140,22 +140,12 @@ def print_checklist(checklist, with_results):
 def perform_checks(checklist: List[Check], parsed_options: dict):
     Env.kernel_config = parsed_options
     for opt in checklist:
-        #if hasattr(opt, 'opts'):
-        #    # prepare ComplexOptCheck
-        #    for o in opt.opts:
-        #        if hasattr(o, 'state'):
-        #            o.state = parsed_options.get(o.name, None)
-        #else:
-        #    # prepare simple check
-        #    if not hasattr(opt, 'state'):
-        #        sys.exit('[!] ERROR: bad simple check {}'.format(vars(opt)))
-        #    opt.state = parsed_options.get(opt.name, None)
         opt.check()
 
 
-def check_config_file(checklist, fname):
+def parse_config(fname) -> dict:
+    parsed_options = OrderedDict()
     with open(fname, 'r') as f:
-        parsed_options = OrderedDict()
         opt_is_on = re.compile("CONFIG_[a-zA-Z0-9_]*=[a-zA-Z0-9_\"]*")
         opt_is_off = re.compile("# CONFIG_[a-zA-Z0-9_]* is not set")
 
@@ -176,20 +166,24 @@ def check_config_file(checklist, fname):
 
             if option is not None:
                 parsed_options[option] = value
+    return parsed_options
 
-        perform_checks(checklist, parsed_options)
 
-        if Env.debug_mode:
-            known_options = []
-            for opt in checklist:
-                if hasattr(opt, 'opts'):
-                    for o in opt.opts:
-                        if hasattr(o, 'name'):
-                            known_options.append(o.name)
-                else:
-                    known_options.append(opt.name)
-            for option, value in parsed_options.items():
-                if option not in known_options:
-                    print('DEBUG: dunno about option {} ({})'.format(option, value))
+def check_config_file(checklist, fname):
+    parsed_options = parse_config(fname)
+    perform_checks(checklist, parsed_options)
 
-        print_checklist(checklist, True)
+    if Env.debug_mode:
+        known_options = []
+        for opt in checklist:
+            if hasattr(opt, 'opts'):
+                for o in opt.opts:
+                    if hasattr(o, 'name'):
+                        known_options.append(o.name)
+            else:
+                known_options.append(opt.name)
+        for option, value in parsed_options.items():
+            if option not in known_options:
+                print('DEBUG: dunno about option {} ({})'.format(option, value))
+
+    print_checklist(checklist, True)

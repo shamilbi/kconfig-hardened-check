@@ -14,3 +14,5 @@ class Env:
 
     # parsed config options
     kernel_config: dict = None
+
+    kernel_arch: str = None

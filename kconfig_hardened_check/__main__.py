@@ -8,8 +8,8 @@ from kconfig_hardened_check import (
     check_config_file, print_checklist)
 
 
-def construct_checklist(arch):
-    parser = Parser(arch, 'rules.txt')
+def construct_checklist():
+    parser = Parser('rules.txt')
     parser.parse()
     return parser.checklist
 
@@ -44,11 +44,11 @@ def main2(args):
         sys.exit('[!] ERROR: options --debug and --json cannot be used simultaneously')
 
     if args.config:
-        arch, msg = detect_arch(args.config)
-        if not arch:
+        Env.kernel_arch, msg = detect_arch(args.config)
+        if not Env.kernel_arch:
             sys.exit('[!] ERROR: {}'.format(msg))
         elif not json_mode:
-            print('[+] Detected architecture: {}'.format(arch))
+            print('[+] Detected architecture: {}'.format(Env.kernel_arch))
 
         kernel_version, msg = detect_version(args.config)
         Env.kernel_version = kernel_version
@@ -58,7 +58,7 @@ def main2(args):
             vstr = '.'.join(str(i) for i in kernel_version)
             print(f'[+] Detected kernel version: {vstr}')
 
-        config_checklist = construct_checklist(arch)
+        config_checklist = construct_checklist()
         check_config_file(config_checklist, args.config)
         error_count = len(list(filter(lambda opt: opt.result.startswith('FAIL'), config_checklist)))
         ok_count = len(list(filter(lambda opt: opt.result.startswith('OK'), config_checklist)))
@@ -67,10 +67,10 @@ def main2(args):
         return
 
     if args.print:
-        arch = args.print
-        config_checklist = construct_checklist(arch)
+        Env.kernel_arch = args.print
+        config_checklist = construct_checklist()
         if not json_mode:
-            print('[+] Printing kernel hardening preferences for {}...'.format(arch))
+            print('[+] Printing kernel hardening preferences for {}...'.format(Env.kernel_arch))
         print_checklist(config_checklist, False)
         sys.exit(0)
 
